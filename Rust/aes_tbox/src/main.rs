@@ -1,5 +1,9 @@
+mod key_exp;
+
 use block_macro_derive::Block;
 use std::fmt::Display;
+use key_exp::{Key};
+
 /* Output is transposed matrix. Row <=> Columns
 Cleartext
 00 11 22 33
@@ -28,10 +32,7 @@ struct Cleartext {
     bytes: [u8; 16],
 }
 
-#[derive(Block)]
-struct Key {
-    bytes: [u8; 16],
-}
+
 
 fn main() {
     let key = Key::from([
@@ -46,4 +47,6 @@ fn main() {
 
     println!("Cleartext\n{}", cleartext);
     println!("Key\n{}", key);
+
+    let exp_key = key.key_expansion();
 }

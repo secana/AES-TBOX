@@ -48,5 +48,5 @@ fn main() {
     println!("Cleartext\n{}", cleartext);
     println!("Key\n{}", key);
 
-    let exp_key = key.key_expansion();
+    let _exp_key = key.key_expansion();
 }

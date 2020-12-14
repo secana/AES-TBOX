@@ -11,3 +11,6 @@ v15/
 cmake-build-debug/
 target/
 Cargo.lock
+.vscode/
+.cmake/
+build/

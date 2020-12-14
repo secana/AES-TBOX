@@ -1,8 +1,8 @@
 mod key_exp;
+mod aes_enc;
 
-use block_macro_derive::Block;
-use std::fmt::Display;
 use key_exp::{Key};
+use aes_enc::{aes_encryption, TBoxes, State};
 
 /* Output is transposed matrix. Row <=> Columns
 Cleartext
@@ -11,28 +11,18 @@ Cleartext
 88 99 AA BB
 CC DD EE FF
 
-
 Key
 00 01 02 03
 04 05 06 07
 08 09 0A 0B
 0C 0D 0E 0F
 
-
 Ciphertext
 69 C4 E0 D8
 6A 7B 04 30
 D8 CD B7 80
 70 B4 C5 5A
-
 */
-
-#[derive(Block)]
-struct Cleartext {
-    bytes: [u8; 16],
-}
-
-
 
 fn main() {
     let key = Key::from([
@@ -40,7 +30,7 @@ fn main() {
         0x0F,
     ]);
 
-    let cleartext = Cleartext::from([
+    let mut cleartext = State::from([
         0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE,
         0xFF,
     ]);
@@ -48,5 +38,9 @@ fn main() {
     println!("Cleartext\n{}", cleartext);
     println!("Key\n{}", key);
 
-    let _exp_key = key.key_expansion();
+    let exp_key = key.key_expansion();
+    let tboxes = TBoxes::new();
+    aes_encryption(&mut cleartext, &exp_key, &tboxes);
+
+    println!("Ciphertext\n{}", cleartext);
 }

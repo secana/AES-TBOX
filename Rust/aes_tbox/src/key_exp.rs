@@ -69,11 +69,11 @@ impl Key {
             }
             if current_size % 16 == 0
             {
-                rcon_iteration += 1;
                 self.key_schedule_core(&mut t, rcon_iteration);
+                rcon_iteration += 1;
             }
-            for i in &t[..] {
-                expanded_key[current_size] = expanded_key[current_size - 16] ^ t[*i as usize];
+            for i in 0..t.len() {
+                expanded_key[current_size] = expanded_key[current_size - 16] ^ t[i];
                 current_size += 1;
             }
         }

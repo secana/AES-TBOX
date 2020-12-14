@@ -8,3 +8,9 @@ CTestTestfile.cmake
 ./idea
 v15/
 .vs/
+cmake-build-debug/
+target/
+Cargo.lock
+.vscode/
+.cmake/
+build/

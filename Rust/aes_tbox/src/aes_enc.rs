@@ -54,10 +54,10 @@ impl TBoxes {
         let mut tbox2: [u32; 256] = [0;256];
         let mut tbox3: [u32; 256] = [0;256];
         for i in 0..256 {
-            tbox0[i] = concat( gf_mult(SBOX[i], 02), SBOX[i], SBOX[i], gf_mult(SBOX[i], 03) );
-            tbox1[i] = concat( gf_mult(SBOX[i], 03), gf_mult(SBOX[i], 02), SBOX[i], SBOX[i] );
-            tbox2[i] = concat( SBOX[i], gf_mult(SBOX[i], 03), gf_mult(SBOX[i], 02), SBOX[i] );
-            tbox3[i] = concat( SBOX[i], SBOX[i], gf_mult(SBOX[i], 03), gf_mult(SBOX[i], 02) );
+            tbox0[i] = concat( gf_mult(SBOX[i], 2), SBOX[i], SBOX[i], gf_mult(SBOX[i], 3) );
+            tbox1[i] = concat( gf_mult(SBOX[i], 3), gf_mult(SBOX[i], 2), SBOX[i], SBOX[i] );
+            tbox2[i] = concat( SBOX[i], gf_mult(SBOX[i], 3), gf_mult(SBOX[i], 2), SBOX[i] );
+            tbox3[i] = concat( SBOX[i], SBOX[i], gf_mult(SBOX[i], 3), gf_mult(SBOX[i], 2) );
         }
 
         Self {
@@ -101,13 +101,14 @@ impl TBoxes {
 fn concat(b0: u8, b1: u8, b2: u8, b3: u8) -> u32 {
     let mut dword: u32 = 0;
     dword += b0 as u32;
-    dword = dword << 8;
+    dword <<= 8;
     dword += b1 as u32;
-    dword = dword << 8;
+    dword <<= 8;
     dword += b2 as u32;
-    dword = dword << 8;
+    dword <<= 8;
     dword += b3 as u32;
-    return dword;
+
+    dword
 }
 
 // multiply in GF 2^8 and reduce by AES polynom if necessary
@@ -157,10 +158,8 @@ fn shift_row(state: &mut State){
 
 // add the subkey to the state
 fn key_add(state: &mut State, key: &[u8; 176], i_round: i32){
-    let mut j: usize = 0;
-    for i in i_round * 16 .. (i_round*16+16) {
+    for (j, i) in (i_round * 16 .. (i_round*16+16)).enumerate() {
         state[j] ^= key[i as usize];
-        j+=1;
     }
 }
 

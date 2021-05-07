@@ -57,9 +57,7 @@ impl Key {
         let mut rcon_iteration: i32 = 1;
         let mut t: [u8; 4] = [0; 4];
         
-        for i in 0..self.bytes.len() {
-            expanded_key[i] = self.bytes[i];
-        }
+        expanded_key[..self.bytes.len()].clone_from_slice(&self.bytes[..]);
         current_size += self.bytes.len();
         
         while current_size < expanded_key.len()
@@ -72,8 +70,8 @@ impl Key {
                 self.key_schedule_core(&mut t, rcon_iteration);
                 rcon_iteration += 1;
             }
-            for i in 0..t.len() {
-                expanded_key[current_size] = expanded_key[current_size - 16] ^ t[i];
+            for i in &t {
+                expanded_key[current_size] = expanded_key[current_size - 16] ^ i;
                 current_size += 1;
             }
         }
@@ -113,7 +111,7 @@ impl Key {
         dword[2] = self.sbox_tlu(dword[2]);
         dword[3] = self.sbox_tlu(dword[3]);
 
-        dword[0] = dword[0]^self.r_con_tlu(iteration as u8);
+        dword[0] ^= self.r_con_tlu(iteration as u8)
     }
 }
 

@@ -1,7 +1,7 @@
 mod key_exp;
 mod aes_enc;
 
-use key_exp::{Key};
+use key_exp::Key;
 use aes_enc::{aes_encryption, TBoxes, State};
 
 /* Output is transposed matrix. Row <=> Columns
@@ -24,6 +24,8 @@ D8 CD B7 80
 70 B4 C5 5A
 */
 
+const TBOXES: TBoxes = TBoxes::new();
+
 fn main() {
     let key = Key::from([
         0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E,
@@ -39,8 +41,7 @@ fn main() {
     println!("Key\n{}", key);
 
     let exp_key = key.key_expansion();
-    let tboxes = TBoxes::new();
-    aes_encryption(&mut cleartext, &exp_key, &tboxes);
+    aes_encryption(&mut cleartext, &exp_key, &TBOXES);
 
     println!("Ciphertext\n{}", cleartext);
 }

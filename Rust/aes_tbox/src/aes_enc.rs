@@ -1,7 +1,7 @@
 use block_macro::Block;
 use std::{fmt::Display, ops::Index, ops::IndexMut};
 
-static SBOX: [u8; 256] = [
+const SBOX: [u8; 256] = [
     //0     1    2      3     4    5     6     7      8    9     A      B    C     D     E     F
     0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76, //0
     0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0, //1
@@ -48,16 +48,19 @@ pub struct TBoxes {
 
 impl TBoxes {
     // compute the four TBoxes
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         let mut tbox0: [u32; 256] = [0;256];
         let mut tbox1: [u32; 256] = [0;256];
         let mut tbox2: [u32; 256] = [0;256];
         let mut tbox3: [u32; 256] = [0;256];
-        for i in 0..256 {
+
+        let mut i = 0;
+        while i < 256 {
             tbox0[i] = concat( gf_mult(SBOX[i], 2), SBOX[i], SBOX[i], gf_mult(SBOX[i], 3) );
             tbox1[i] = concat( gf_mult(SBOX[i], 3), gf_mult(SBOX[i], 2), SBOX[i], SBOX[i] );
             tbox2[i] = concat( SBOX[i], gf_mult(SBOX[i], 3), gf_mult(SBOX[i], 2), SBOX[i] );
             tbox3[i] = concat( SBOX[i], SBOX[i], gf_mult(SBOX[i], 3), gf_mult(SBOX[i], 2) );
+            i += 1;
         }
 
         Self {
@@ -98,7 +101,7 @@ impl TBoxes {
 }
 
 // concatenate four byte to a dword
-fn concat(b0: u8, b1: u8, b2: u8, b3: u8) -> u32 {
+const fn concat(b0: u8, b1: u8, b2: u8, b3: u8) -> u32 {
     let mut dword: u32 = 0;
     dword += b0 as u32;
     dword <<= 8;
@@ -112,10 +115,11 @@ fn concat(b0: u8, b1: u8, b2: u8, b3: u8) -> u32 {
 }
 
 // multiply in GF 2^8 and reduce by AES polynom if necessary
-fn gf_mult(mut b_fac1: u8, mut b_fac2: u8) -> u8 {
+const fn gf_mult(mut b_fac1: u8, mut b_fac2: u8) -> u8 {
     let mut p: u8 = 0;
     let mut hi_bit_set: u8;
-    for _ in 0..8 {
+    let mut i = 0;
+    while i < 8 {
         if (b_fac2 & 1) == 1 {
             p ^= b_fac1;
         }
@@ -125,6 +129,7 @@ fn gf_mult(mut b_fac1: u8, mut b_fac2: u8) -> u8 {
             b_fac1 ^= 0x1b;		
         }
         b_fac2 >>= 1;
+        i += 1;
     }
     p
 }

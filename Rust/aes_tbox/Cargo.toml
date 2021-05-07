@@ -8,4 +8,3 @@ version = "0.1.0"
 
 [dependencies]
 block_macro = {path = "../block_macro"}
-block_macro_derive = {path = "../block_macro/block_macro_derive"}

@@ -1,4 +1,4 @@
-use block_macro_derive::Block;
+use block_macro::Block;
 use std::fmt::Display;
 
 static KS_BOX: [u8; 256] = [

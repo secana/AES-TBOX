@@ -1,7 +1,7 @@
 use block_macro::Block;
 use std::fmt::Display;
 
-static KS_BOX: [u8; 256] = [
+const KS_BOX: [u8; 256] = [
 //0     1    2      3     4    5     6     7      8    9     A      B    C     D     E     F
 0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76, //0
 0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0, //1
@@ -20,7 +20,7 @@ static KS_BOX: [u8; 256] = [
 0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf, //E
 0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16 ]; //F
 
-static R_CON: [u8; 255]= [
+const R_CON: [u8; 255]= [
 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8,
 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3,
 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f,
@@ -80,21 +80,21 @@ impl Key {
     }
 
     // table lookup for the Rcon in the key schedule
-    fn r_con_tlu(&self, num: u8) -> u8 {
+    const fn r_con_tlu(&self, num: u8) -> u8 {
         R_CON[num as usize]
     }
 
     // table lookup for the Sbox
-    fn sbox_tlu(&self, num: u8) -> u8 {
+    const fn sbox_tlu(&self, num: u8) -> u8 {
         KS_BOX[num as usize]
     }
 
     // Rotate a BYTE[4] one byte to the left
-    fn rotate(&self, dword: &mut [u8; 4]) {
+    const fn rotate(&self, dword: &mut [u8; 4]) {
         let t = dword[0];
-        for i in 0..3 {
-            dword[i] = dword[i+1];
-        }
+        dword[0] = dword[1];
+        dword[1] = dword[2];
+        dword[2] = dword[3];
         dword[3] = t;
     }
 
@@ -103,7 +103,7 @@ impl Key {
         SBox tlu for every byte in the dword
         xor the first byte dword with Rcon tlu value
     */
-    fn key_schedule_core(&self, dword: &mut [u8; 4], iteration: i32)
+    const fn key_schedule_core(&self, dword: &mut [u8; 4], iteration: i32)
     {
         self.rotate(dword);
         dword[0] = self.sbox_tlu(dword[0]);
